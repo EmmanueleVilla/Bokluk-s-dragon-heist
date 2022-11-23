@@ -4,7 +4,7 @@ using UnityEngine;
 public class DashManager : MonoBehaviour {
     private const int MaxDashes = 1;
     private const float DashingPower = 8f;
-    private const float DashingTime = 0.5f;
+    private const float DashingTime = 0.35f;
 
     public bool IsDashing { get; private set; }
 

@@ -59,7 +59,7 @@ public class BoklukController : MonoBehaviour {
     public void Update() {
         var velocity = _rigidbody2D.velocity;
 
-        var isGrounded = IsGrounded();
+        var isGrounded = velocity.y < 0.5 && IsGrounded();
         if (isGrounded) {
             _jumpedTimes = 0;
             _dashManager.SetPlayerGrounded();

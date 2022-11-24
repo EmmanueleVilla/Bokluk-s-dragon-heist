@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class DashManager : MonoBehaviour {
     private const int MaxDashes = 1;
-    private const float DashingPower = 8f;
-    private const float DashingTime = 0.35f;
+    [SerializeField] private float dashingPower;
+    [SerializeField] private float dashingTime;
 
     public bool IsDashing { get; private set; }
 
@@ -37,7 +37,7 @@ public class DashManager : MonoBehaviour {
         IsDashing = true;
         _rigidbody2D.gravityScale = 0;
         var velocity = new Vector2(
-            DashingPower * (direction ? -1 : 1),
+            dashingPower * (direction ? -1 : 1),
             0
         );
 
@@ -47,7 +47,7 @@ public class DashManager : MonoBehaviour {
     }
 
     private IEnumerator DashCooldown() {
-        yield return new WaitForSeconds(DashingTime);
+        yield return new WaitForSeconds(dashingTime);
         IsDashing = false;
         _rigidbody2D.gravityScale = _baseGravity;
     }

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
@@ -7,19 +8,22 @@ public class BoklukController : MonoBehaviour {
     [SerializeField] private Transform[] groundCheck;
     [SerializeField] private LayerMask groundLayer;
 
+    [SerializeField] private float speed;
+    [SerializeField] private float jumpPower;
+
     private Rigidbody2D _rigidbody2D;
     private Transform _transform;
     private Animator _animator;
     private SpriteRenderer _renderer;
     private DashManager _dashManager;
 
+
     private float _horizontal;
-    private const float Speed = 5f;
-    private const float JumpPower = 4.5f;
     private bool _isFacingRight = true;
     private bool _maybeDash;
     private bool _maybeFire;
     private bool _maybeJump;
+    private bool _canJump = true;
     private float _jumpedTimes = 0;
     private float _maxJumps = 2;
     private static readonly int RunKey = Animator.StringToHash("Run");
@@ -74,18 +78,20 @@ public class BoklukController : MonoBehaviour {
         }
 
         if (!_dashManager.IsDashing) {
-            velocity.x = _horizontal * Speed;
+            velocity.x = _horizontal * speed;
 
             if (_maybeFire) {
                 //TODO: shoot
             }
 
-            if (_maybeJump) {
-                if (_jumpedTimes < _maxJumps) {
-                    velocity.y = JumpPower;
-                    _jumpedTimes++;
-                }
+            if (_maybeJump && _canJump && _jumpedTimes < _maxJumps) {
+                velocity.y = jumpPower;
+                _jumpedTimes++;
             }
+        }
+
+        if (velocity.y < 0) {
+            velocity.y -= 12 * Time.deltaTime;
         }
 
         _rigidbody2D.velocity = velocity;
@@ -100,5 +106,29 @@ public class BoklukController : MonoBehaviour {
         _maybeDash = false;
         _maybeFire = false;
         _maybeJump = false;
+    }
+
+    private void OnTriggerEnter2D(Collider2D col) {
+        switch (col.gameObject.tag) {
+            case "Trampoline":
+                var trampoline = col.GetComponent<HasTrampolineManager>();
+                if (trampoline != null) {
+                    _canJump = false;
+                    StartCoroutine(ResetCanJump());
+                    _rigidbody2D.velocity = new Vector2(_rigidbody2D.velocity.x,
+                        trampoline.trampolineManager.trampolinePower);
+                    trampoline.trampolineManager.Trigger();
+                }
+
+                break;
+            case "Coin":
+                Destroy(col.gameObject);
+                break;
+        }
+    }
+
+    private IEnumerator ResetCanJump() {
+        yield return new WaitForSeconds(0.5f);
+        _canJump = true;
     }
 }

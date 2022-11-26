@@ -90,7 +90,7 @@ public class BoklukController : MonoBehaviour {
             }
         }
 
-        if (velocity.y < 0) {
+        if (velocity.y is < 0 and > -30f) {
             velocity.y -= 12 * Time.deltaTime;
         }
 
